@@ -325,7 +325,7 @@ export function BackendPage() {
           summary="純粋関数コア／ロックフリー設計／depguard機械強制"
         >
           <div>
-            <p style={sectionSubheading}>サーバーエンジニアとしての狂気</p>
+            <p style={sectionSubheading}>サーバーエンジニアとしての設計哲学</p>
             <p style={sectionBody}>
               ただ仕様を満たすだけではなく、99人という大規模スケールでの並行処理の安定性と、チーム開発における「コアロジックの安全性」を両立するために極限までこだわった実装面での工夫です。
             </p>
