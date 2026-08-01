@@ -1,6 +1,7 @@
 // フロントページ（Modernist版）。DESIGN_SPEC.md と PlanningPage.tsx を型として、
 // 旧デザイン版フロントページ（Textro99-Client-Docs / Textro99-WebFront を出典とする内容）を
 // そのまま移植したもの。文言・データは変えていない。
+import { Fragment } from "react";
 import { Nav } from "../layout/Nav";
 import { RemoteNav } from "../layout/RemoteNav";
 import { Disclosure } from "../layout/Disclosure";
@@ -9,10 +10,10 @@ import { sectionBody, sectionSubheading, tableScroll } from "../layout/prose";
 const F = "frontend" as const;
 
 const coreLoop = [
-  { num: "1", title: "MatchStart受信", note: "初期ダケン・パラメータ公開サブセット" },
-  { num: "2", title: "打鍵判定（ローカル）", note: "表示用。勝敗の値はここで確定しない" },
-  { num: "3", title: "DakenClearReport送信", note: "ダケン単位。1文字ごとに往復しない" },
-  { num: "4", title: "サーバーが確定", note: "コンボ・実効難易度を計算" },
+  { num: "1", title: "MatchStart受信", note: "初期ダケン・パラメータ公開" },
+  { num: "2", title: "打鍵判定（ローカル）", note: "勝敗の値はここで確定しない" },
+  { num: "3", title: "打鍵の正誤判定送信", note: "1文字ごとに送信しない" },
+  { num: "4", title: "サーバーで確定", note: "コンボ・実効難易度を計算" },
   { num: "5", title: "受信stateを描画", note: "ComboUpdated / DakenIssued を写すだけ" },
 ];
 
@@ -35,7 +36,7 @@ const highlights = [
   {
     tag: "なぜ／Unity移行",
     title: "Unity側の作業を「見た目づくり」だけに減らしたかった",
-    body: "接続・送受信・ディスパッチ層をWebで参照実装として確立し、そのままミラーできる契約にした。",
+    body: "今後Unityに移行するにあたり、接続・送受信・ディスパッチ層をWebで参照実装として確立し、そのままミラーできる契約にした。",
   },
 ];
 
@@ -241,9 +242,10 @@ export function FrontendPage() {
           <i style={{ width: 10, height: 10, background: "var(--color-accent)", display: "inline-block", flexShrink: 0 }} />
           通信ループ（ダケン単位で報告する）
         </span>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", rowGap: 16 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "center", rowGap: 16 }}>
           {coreLoop.map((step, i) => (
-            <div key={step.num} style={{ display: "flex", alignItems: "flex-start", gap: 4 }}>
+            <Fragment key={step.num}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 4 }}>
               <div
                 style={{
                   width: 168,
@@ -306,6 +308,8 @@ export function FrontendPage() {
                 </svg>
               )}
             </div>
+            {step.num === "3" && <div style={{ flexBasis: "100%", width: 0 }} />}
+            </Fragment>
           ))}
         </div>
         <p style={{ margin: "24px 0 0", fontSize: 13, color: "color-mix(in srgb, var(--color-text) 55%, transparent)" }}>
