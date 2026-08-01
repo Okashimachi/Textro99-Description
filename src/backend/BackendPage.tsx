@@ -64,6 +64,19 @@ const bandwidthRows = [
   ["送信頻度の間引き", "KO等の重要イベントは即時、細かな更新は間引いて送信。"],
 ];
 
+const combatReworkRows = [
+  ["Enter攻撃の廃止と自動発火 (#77)", "当初は「任意のタイミングでEnterで攻撃」だったが、「ノーミスクリア時に自動発火」へ刷新。テンポが向上した。"],
+  ["お題の先読みと「割り込み」 (#81)", "通信遅延による硬直を防ぐため、通常ダケンを先読みで複数渡しつつ、被弾ダケンは3つ先に割り込ませる複雑なキューイング制御を導入。"],
+  ["スタックが減らないバグ (#78, #86)", "被弾ダケンが時間切れで適切に消滅せずスタックが増え続けるバグ。Tick駆動のステートマシンでのタイマー管理の難しさを露呈した。"],
+  ["順位計算のサーバー権威化 (#80)", "クライアントでの近似計算では順位がズレるため、サーバー側で確実な rank を算出して配信するように変更。"],
+];
+
+const infraRows = [
+  ["Postgresと設定管理API (#49, #50)", "設定のハードコードを辞め、稼働中のコンボ係数やスタック上限を `/api/params` で動的に差し替え可能にした。再デプロイ不要の調整を実現。"],
+  ["Botの自動補完と強さ制御 (#83, #87, #93)", "人数不足時にBotを自動投入。さらにBotの「強さ」自体も外部configから制御可能にし、テストや実運用での柔軟性を高めた。"],
+  ["ゴースト接続（リソース圧迫）対策 (#85)", "試合終了後のリザルト画面でクライアントが接続を維持し続ける問題に対し、試合終了時にサーバー側から強制的に全接続をクローズする処理を追加。"],
+];
+
 const rules = [
   "打鍵判定（TypingJudge）はクライアントの責務。サーバーに実装しない",
   "protoを人間承認なしに変更して実装を進めない",
@@ -370,6 +383,72 @@ export function BackendPage() {
                 </li>
               ))}
             </ul>
+          </div>
+        </Disclosure>
+      </section>
+
+      {/* ── 詳細2：実運用の壁 ── */}
+      <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 24px" }}>
+        <Disclosure
+          title="実運用の壁と戦闘ルールの刷新"
+          summary="DemoStageに向けた抜本改修／Enter攻撃の廃止／先読みと割り込み"
+        >
+          <div>
+            <p style={sectionSubheading}>ゲーム性と通信の課題への対応</p>
+            <p style={sectionBody}>
+              実際に動かして発覚したゲームテンポの悪さや、通信遅延による硬直に対処するため、DemoStage直前に大規模な「戦闘刷新」を行いました。
+            </p>
+            <div style={tableScroll}>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>歴史と改修内容</th>
+                    <th>詳細・背景</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {combatReworkRows.map((r) => (
+                    <tr key={r[0]}>
+                      <td>{r[0]}</td>
+                      <td>{r[1]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </Disclosure>
+      </section>
+
+      {/* ── 詳細3：インフラと運用体制 ── */}
+      <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 40px" }}>
+        <Disclosure
+          title="安定運用のためのインフラと設定管理"
+          summary="PostgresとAPI／Bot補完／ゴースト接続対策"
+        >
+          <div>
+            <p style={sectionSubheading}>サービスを止めずに調整する工夫</p>
+            <p style={sectionBody}>
+              99人対戦を止めずにゲームバランスを調整したり、ハッカソン特有の「人が集まらない」問題に対処するためのバックエンドの工夫です。
+            </p>
+            <div style={tableScroll}>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>インフラ・運用基盤</th>
+                    <th>詳細・背景</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {infraRows.map((r) => (
+                    <tr key={r[0]}>
+                      <td>{r[0]}</td>
+                      <td>{r[1]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </Disclosure>
       </section>
