@@ -9,12 +9,12 @@ const CARDS: { id: AccentId; href: string; desc: string }[] = [
   {
     id: "planning",
     href: "/planning",
-    desc: "コンセプト・数値設計・意思決定の記録など、企画/仕様面で意識したこと",
+    desc: "コンセプト、単位設計で防いだ破綻、却下案まで残す意思決定の記録、実装しながら覆した仕様",
   },
   {
     id: "frontend",
     href: "/frontend",
-    desc: "サーバー権威を前提にしたクライアント設計・開発体験まわりの工夫",
+    desc: "サーバー権威下でクライアントを薄く保つ設計、自作ローマ字オートマトン、Unityミラー前提の契約",
   },
   {
     id: "backend",

@@ -68,6 +68,11 @@ src/
     Panel.tsx          … 白カード＋色チップ＋見出しの汎用パーツ（テキストロ本体 hud/Panel.tsx と同じ見た目パターンだが、
                           ゲームHUD専用トーンに縛られない別実装として作る。コードはコピー元を参照するだけで import はしない）
     accentTheme.ts     … ページ別アクセントカラーの対応表
+    Figure.tsx         … 図表のガワ（キャプション＋横スクロール退避）
+    Table.tsx          … 仕様書の表をそのまま載せるための素朴なテーブル
+    Flow.tsx           … 一本道の図（単位の変換フロー・レイヤー依存の向きなど）
+    Sequence.tsx       … シーケンス図（SVG）。上流ドキュメントの mermaid 図をここで見せるための最小実装
+    Callout.tsx        … 「絶対原則」など1点だけ強調する箱
   top/
     TopPage.tsx        … トップ（3カード分岐＋チーム紹介＋遊んでみるCTA）
   planning/
@@ -97,6 +102,8 @@ src/
   - フロント＝sky
   - バックエンド＝emerald
 - コンポーネントの見た目パターンはテキストロ本体を参考に再実装するが、**別リポジトリなのでコードの直接共有（import）はしない**。
+- 図（シーケンス図・フロー図）は上流ドキュメント（Textro99-Docs / Client-Docs）の mermaid を流用するが、**mermaid をランタイムに載せない**。`layout/Sequence.tsx` `layout/Flow.tsx` が素のSVG/HTMLで描く（ライブラリを新規導入しない方針＝6章に合わせる）。
+  - ⚠ SVGの着色は Tailwind の `fill-*` クラスで行うが、**クラス名を実行時に文字列連結して作らない**（Tailwind はソースを走査してCSSを生成するため、生成されず色が消える）。`Sequence.tsx` のようにリテラルの対応表を持つこと。
 
 ---
 
