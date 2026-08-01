@@ -13,8 +13,8 @@ const coreLoop = [
   { num: "1", title: "ダケンをタイプ", note: "ノーミスでコンボ蓄積" },
   { num: "2", title: "攻撃が飛ぶ", note: "コンボを原資に相手へ" },
   { num: "3", title: "相手に予告", note: "着弾まで猶予1.5秒" },
-  { num: "4", title: "相殺 or 被弾", note: "守る手段も「正確に打つ」こと" },
-  { num: "5", title: "スタック上限20で脱落", note: "優劣がそのまま可視化される" },
+  { num: "4", title: "相殺 or 被弾", note: "タイピングで防御" },
+  { num: "5", title: "スタック上限で脱落", note: "優劣が可視化される" },
 ];
 
 const highlights = [
@@ -33,11 +33,11 @@ const highlights = [
     title: "同じ不具合を二度直したくなかった",
     body: "過去の被弾履歴を持たず「到達済み最大値」だけを覚えるハイウォーターマーク方式に。",
   },
-  {
-    tag: "なぜ／作戦",
-    title: "作り込みすぎて実装が止まるのを避けたかった",
-    body: "メイン4作戦で完成させ、拡張6種はバランス調整用として優先度を切って追加した。",
-  },
+  // {
+  //   tag: "なぜ／作戦",
+  //   title: "作り込みすぎて実装が止まるのを避けたかった",
+  //   body: "メイン4作戦で完成させ、拡張6種はバランス調整用として優先度を切って追加した。",
+  // },
 ];
 
 const unitExamples = [
@@ -139,7 +139,6 @@ const todoItems = [
   "ダケンプールの実データ（単語リスト・煽り文リスト）はテーマ確定後に着手",
   "コンボ→威力の逓増カーブは等倍のまま保留",
   "切断・再接続の扱い。まずは即脱落の割り切りで開始し、Bot実装後に段階的拡張予定",
-  "タイトル名・テーマの正式決定",
 ];
 
 const bodyMuted: CSSProperties = {
@@ -185,7 +184,7 @@ export function PlanningPage() {
             margin: "0 0 16px",
           }}
         >
-          寿司打 × テトリス99 × ぷよぷよ通
+          寿司打 × テトリス99
         </h1>
         <p
           style={{
@@ -196,7 +195,7 @@ export function PlanningPage() {
             margin: "0 0 20px",
           }}
         >
-          タイピングという行為自体には一切手を入れず、その周囲に「攻撃」「防御」「ターゲティング」という薄い対戦レイヤーだけを乗せて99人バトルロイヤル化する。
+          タイピングという行為自体には一切手を入れず、その周囲に「攻撃」「防御」という薄い対戦レイヤーだけを乗せて99人バトルロイヤル化する。
         </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <a href="https://github.com/Okashimachi/Textro99-Docs" target="_blank" rel="noreferrer" className="tag tag-outline">
@@ -217,11 +216,14 @@ export function PlanningPage() {
             fontWeight: 800,
             fontSize: "clamp(22px,3.2vw,34px)",
             lineHeight: 1.4,
+            textAlign: "center",
           }}
         >
-          「速く打ちたい、でもミスしたくない」——
+          「速く打ちたい、でもミスしたくない」
           <br />
-          そのタイピングの根源的なジレンマを、そのまま攻撃力と生存に直結させた。
+          そのタイピングの根源的なジレンマを、
+          <br />
+          そのまま攻撃力と生存に直結させた。
         </p>
       </section>
 
@@ -243,7 +245,7 @@ export function PlanningPage() {
           }}
         >
           <i style={{ width: 10, height: 10, background: "var(--color-accent)", display: "inline-block", flexShrink: 0 }} />
-          コアループ（1試合5〜10分）
+          コアループ（1試合2〜5分想定）
         </span>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", rowGap: 16 }}>
           {coreLoop.map((step, i) => (
@@ -428,7 +430,7 @@ export function PlanningPage() {
             </div>
           </div>
 
-          <div>
+          {/* <div>
             <p style={subheading}>ターゲティング作戦（数字キー 0〜9 で10種）</p>
             <p style={bodyMuted}>
               メイン4種はテトリス99準拠。拡張6種はバランス調整の役割を持たせて設計（報復の納得感／溜めプレイの牽制／安全ファームの牽制）。初期実装は1〜4だけでも成立する。
@@ -455,7 +457,7 @@ export function PlanningPage() {
               </tbody>
             </table>
             </div>
-          </div>
+          </div> */}
 
           <div>
             <p style={subheading}>難易度：全体の圧と個人の圧を合成</p>
@@ -620,7 +622,7 @@ export function PlanningPage() {
           <div>
             <p style={subheading}>テーマを差し替えても仕様が壊れない構造</p>
             <p style={{ fontSize: 14, lineHeight: 1.7, color: "color-mix(in srgb, var(--color-text) 78%, transparent)", margin: 0 }}>
-              「テキストロ99」は仮称で、寿司モチーフ自体も変更予定。そこで仕様書・コードではテーマ非依存の抽象名（ダケン／ダケンスタック／トラップダケン）を概念名として使い、表示名とアートだけを差し替えれば済む構造にしている。日本語の会話用語とコード上の名称の対応を用語集で正典化し、企画・サーバー(Go)・Web(TS)・Unity(C#)の4リポジトリすべてで同じ語を使う。
+              「テキストロ99」は仮称で、本番のモチーフ自体も変更予定。そこで仕様書・コードではテーマ非依存の抽象名（ダケン／ダケンスタック／トラップダケン）を概念名として使い、表示名とアートだけを差し替えれば済む構造にしている。日本語の会話用語とコード上の名称の対応を用語集で正典化し、企画・サーバー(Go)・Web(TS)・Unity(C#)の4リポジトリすべてで同じ語を使う。
             </p>
           </div>
           <div>
