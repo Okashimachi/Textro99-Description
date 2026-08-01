@@ -20,14 +20,14 @@ const CARDS: { id: AccentId; href: string; title: string; desc: string }[] = [
   {
     id: "frontend",
     href: "/frontend",
-    title: "フロント",
+    title: "フロントエンド",
     desc: "サーバー権威下でクライアントを薄く保つ設計、自作ローマ字オートマトン、Unityミラー前提の契約",
   },
   {
     id: "backend",
     href: "/backend",
     title: "バックエンド",
-    desc: "99人同時対戦を支えるサーバー(Go)のアーキテクチャ",
+    desc: "通信と時間を排した純粋関数コア、1試合=1Goroutineのロックフリー設計、Bot99体での負荷検証など、99人同時対戦を支えるサーバー(Go)のアーキテクチャ",
   },
 ];
 
@@ -41,7 +41,7 @@ const MEMBERS = [
   {
     name: "カシュー",
     icon: "/team/Cashew-Icon.jpg",
-    role: "リーダー / 企画・仕様・フロントエンド",
+    role: "リーダー\n企画・仕様・フロントエンド",
     x: "https://x.com/game_game_nuts",
     github: "https://github.com/kdix-23-240",
   },
@@ -260,7 +260,7 @@ export function TopPage() {
                 <p className="card-title" style={{ fontSize: 16, margin: 0 }}>
                   {m.name}
                 </p>
-                <p style={{ margin: "2px 0 8px", fontSize: 12.5, color: "color-mix(in srgb, var(--color-text) 60%, transparent)" }}>
+                <p style={{ margin: "2px 0 8px", fontSize: 12.5, color: "color-mix(in srgb, var(--color-text) 60%, transparent)", whiteSpace: "pre-line" }}>
                   {m.role}
                 </p>
                 <div style={{ display: "flex", gap: 10 }}>
