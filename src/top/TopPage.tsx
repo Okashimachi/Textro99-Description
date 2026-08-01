@@ -20,14 +20,14 @@ const CARDS: { id: AccentId; href: string; title: string; desc: string }[] = [
   {
     id: "frontend",
     href: "/frontend",
-    title: "フロント",
+    title: "フロントエンド",
     desc: "サーバー権威下でクライアントを薄く保つ設計、自作ローマ字オートマトン、Unityミラー前提の契約",
   },
   {
     id: "backend",
     href: "/backend",
     title: "バックエンド",
-    desc: "99人同時対戦を支えるサーバー(Go)のアーキテクチャ",
+    desc: "通信と時間を排した純粋関数コア、1試合=1Goroutineのロックフリー設計、Bot99体での負荷検証など、99人同時対戦を支えるサーバー(Go)のアーキテクチャ",
   },
 ];
 
@@ -41,7 +41,7 @@ const MEMBERS = [
   {
     name: "カシュー",
     icon: "/team/Cashew-Icon.jpg",
-    role: "リーダー / 企画・仕様・フロントエンド",
+    role: "リーダー\n企画・仕様・フロントエンド",
     x: "https://x.com/game_game_nuts",
     github: "https://github.com/kdix-23-240",
   },
@@ -84,7 +84,7 @@ export function TopPage() {
             marginBottom: 14,
           }}
         >
-          開発者向け解説サイト
+          {/*開発者向け解説サイト*/}
         </span>
         <h1
           style={{
@@ -107,7 +107,11 @@ export function TopPage() {
             color: "color-mix(in srgb, var(--color-text) 78%, transparent)",
           }}
         >
-          99人バトルロイヤル型タイピングゲーム「テキストロ99」を、企画・フロント・サーバーの3つの観点から紹介します。開発チーム「おかしまち」制作。
+          99人バトルロイヤル型タイピングゲーム「テキストロ99」を、
+          <br />
+          企画・フロント・サーバーの3つの観点から紹介します。
+          <br />
+          開発チーム「おかしまち」制作。
         </p>
       </header>
 
@@ -120,11 +124,14 @@ export function TopPage() {
             fontWeight: 800,
             fontSize: "clamp(22px,3.2vw,34px)",
             lineHeight: 1.4,
+            textAlign: "center",
           }}
         >
-          寿司打のタイピングに、テトリス99の99人対戦と
+          寿司打のタイピングに、
           <br />
-          ぷよぷよ通の攻防を掛け合わせた——それがテキストロ99。
+          テトリス99の対戦方式を掛け合わせた
+          <br />
+          それがテキストロ99。
         </p>
       </section>
 
@@ -253,7 +260,7 @@ export function TopPage() {
                 <p className="card-title" style={{ fontSize: 16, margin: 0 }}>
                   {m.name}
                 </p>
-                <p style={{ margin: "2px 0 8px", fontSize: 12.5, color: "color-mix(in srgb, var(--color-text) 60%, transparent)" }}>
+                <p style={{ margin: "2px 0 8px", fontSize: 12.5, color: "color-mix(in srgb, var(--color-text) 60%, transparent)", whiteSpace: "pre-line" }}>
                   {m.role}
                 </p>
                 <div style={{ display: "flex", gap: 10 }}>

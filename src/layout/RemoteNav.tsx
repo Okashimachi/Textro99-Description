@@ -79,8 +79,8 @@ const ITEMS: NavItem[] = [
     id: "backend",
     href: "/backend",
     label: "バックエンド",
-    hint: "準備中",
-    enabled: false,
+    hint: "99人同時対戦を支える設計",
+    enabled: true,
     icon: (
       <svg {...ICON_PROPS} style={{ flexShrink: 0 }}>
         <rect x="2" y="3" width="20" height="8" rx="2" />
