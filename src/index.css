@@ -2,7 +2,193 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================================
+ * "Modernist" デザイントークン
+ *
+ * ClaudeDesign（DC）で生成したデザイン（DESIGN_SPEC.md）の再現用。本来は
+ * `_ds/modernist-.../styles.css` + `_ds_bundle.js` を読み込む前提のデザインシステムだが、
+ * このリポジトリは DC ランタイムを持たない素の Vite+React なので、そこで使われている
+ * var(--color-*) / var(--font-*) トークンと、テンプレートが依存する最小限のクラス
+ * （.card / .tag / .table / .hr / .nav など）をここで自前定義して再現する。
+ * 色の正確な値はソースが手元にないため近似（アクセント #ec3013 のみ確定値）。
+ * ============================================================================ */
+:root {
+  --color-bg: #ffffff;
+  --color-text: #16130f;
+  --color-surface: #f5f3f0;
+  --color-divider: #e3dfd9;
+
+  --color-accent: #ec3013;
+  --color-accent-100: #fce1d8;
+  --color-accent-600: #d42a10;
+  --color-accent-700: #a8210b;
+
+  --font-heading: "Archivo", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-body: "Archivo", "Hiragino Sans", "Noto Sans JP", sans-serif;
+
+  --radius-md: 0px;
+  --shadow-sm: 0 1px 3px rgba(20, 15, 10, 0.08);
+  --shadow-lg: 0 20px 44px rgba(20, 15, 10, 0.22), 0 4px 10px rgba(20, 15, 10, 0.12);
+}
+
 html {
   color-scheme: light;
-  background-color: #f4f4f5;
+  background-color: var(--color-bg);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  text-wrap: pretty;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* ── Modernist 基本コンポーネント（テンプレートが className で参照するもの） ── */
+
+.hr {
+  border: none;
+  border-top: 2px solid var(--color-divider);
+  margin: 0;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 2px solid var(--color-divider);
+}
+
+.nav-brand {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  line-height: 1.4;
+}
+
+.tag-outline {
+  border: 1.5px solid var(--color-divider);
+  color: var(--color-text);
+  background: transparent;
+  transition: border-color 0.15s, color 0.15s;
+}
+.tag-outline:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-700);
+}
+
+.tag-neutral {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+.card-kicker {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent-700);
+}
+
+.card-title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.card-body {
+  margin: 0;
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--color-text) 78%, transparent);
+}
+
+/* リンクとして遷移するカード（トップの3分岐カード等）。
+   同じ .card でもクリックできないカード（チーム紹介・メンバー等）と見分けが
+   つくよう、ホバーで色/影/浮き上がりを変えて「押せる」ことを示す。 */
+.card-link {
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s, background 0.15s;
+}
+.card-link:hover {
+  border-color: var(--color-accent) !important;
+  box-shadow: var(--shadow-lg) !important;
+  transform: translateY(-2px);
+  background: var(--color-accent-100);
+}
+.card-link-title {
+  transition: color 0.15s;
+}
+.card-link:hover .card-link-title {
+  color: var(--color-accent-700);
+}
+.card-link:active {
+  transform: translateY(0);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table th,
+.table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-divider);
+  vertical-align: top;
+  line-height: 1.55;
+}
+.table th {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  border-bottom: 2px solid var(--color-divider);
+  white-space: nowrap;
+}
+.table code {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: none;
+}
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+.btn-primary:hover {
+  background: var(--color-accent-600);
 }
