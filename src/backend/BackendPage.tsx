@@ -64,26 +64,61 @@ const bandwidthRows = [
   ["送信頻度の間引き", "KO等の重要イベントは即時、細かな更新は間引いて送信。"],
 ];
 
-const combatReworkRows = [
-  ["Enter攻撃の廃止と自動発火 (#77)", "当初は「任意のタイミングでEnterで攻撃」だったが、「ノーミスクリア時に自動発火」へ刷新。テンポが向上した。"],
-  ["お題の先読みと「割り込み」 (#81)", "通信遅延による硬直を防ぐため、通常ダケンを先読みで複数渡しつつ、被弾ダケンは3つ先に割り込ませる複雑なキューイング制御を導入。"],
-  ["スタックが減らないバグ (#78, #86)", "被弾ダケンが時間切れで適切に消滅せずスタックが増え続けるバグ。Tick駆動のステートマシンでのタイマー管理の難しさを露呈した。"],
-  ["順位計算のサーバー権威化 (#80)", "クライアントでの近似計算では順位がズレるため、サーバー側で確実な rank を算出して配信するように変更。"],
+const combatReworks = [
+  {
+    title: "誰も攻撃しなくなり、ゲームのテンポが死んだ",
+    wall: "初期実装では「任意のタイミングでEnterキーを押して攻撃」でしたが、コンボを溜め込むメリットが強すぎたため、誰も攻撃せず黙々とタイピングするだけのゲームになりかけました。",
+    solution: "Enterキーによる手動攻撃を廃止し、「お題をノーミスでクリアした瞬間に自動発火」へゲームルールを刷新しました。",
+    reason: "「純粋なタイピングの連続（ノーミス継続）」自体が最大の攻撃になるようにゲーム性を根本から変え、テンポと駆け引きを生み出すためです。"
+  },
+  {
+    title: "通信遅延でタイピングが「止まる」",
+    wall: "1つのお題をクリアするたびにサーバーから次のお題が降ってくるのを待っていると、ネットワークのRTT（往復遅延）の分だけ毎回タイピングの手が止まってしまい、プレイ感が最悪でした。",
+    solution: "お題を常に数件「先読み（Nextストック）」でクライアントに渡しつつ、他プレイヤーから被弾したお題（EnemySent）はキューの「3つ先」に割り込ませる複雑な制御を導入しました。",
+    reason: "ローカルで即座に次のお題へ進める爽快感を維持しつつ、他者からの攻撃という「インタラプト（割り込み）」を自然な形で成立させるためです。"
+  },
+  {
+    title: "クライアントごとに「自分の順位」が違う",
+    wall: "99人がリアルタイムに脱落していく中、クライアントのローカル計算だけで順位を推測させた結果、画面上の順位と実際の順位がズレる（Desync）問題が多発しました。",
+    solution: "クライアント側での近似計算を一切やめ、サーバー側で確実な rank（確定順位）を算出して毎フレーム配信するようにしました。",
+    reason: "バトルロイヤルにおいて「順位」は最も重要な競技情報であり、ここがズレるとプレイヤーの納得感が失われるため、完全にサーバー権威へ移行しました。"
+  }
 ];
 
-const infraRows = [
-  ["Postgresと設定管理API (#49, #50)", "設定のハードコードを辞め、稼働中のコンボ係数やスタック上限を `/api/params` で動的に差し替え可能にした。再デプロイ不要の調整を実現。"],
-  ["Botの自動補完と強さ制御 (#83, #87, #93)", "人数不足時にBotを自動投入。さらにBotの「強さ」自体も外部configから制御可能にし、テストや実運用での柔軟性を高めた。"],
-  ["ゴースト接続（リソース圧迫）対策 (#85)", "試合終了後のリザルト画面でクライアントが接続を維持し続ける問題に対し、試合終了時にサーバー側から強制的に全接続をクローズする処理を追加。"],
+const infraOps = [
+  {
+    title: "デプロイしないとゲームバランスがいじれない",
+    wall: "「コンボ係数」や「スタック上限」といったバランス調整値がコードに直書き（ハードコード）されていたため、ハッカソン本番の限られた時間の中で調整するたびに再デプロイが必要でした。",
+    solution: "Postgresデータベースと設定管理API（/api/params）を構築しました。",
+    reason: "サーバーを落とさずに稼働中のパラメータを動的に書き換えられるようにし、本番中のリアルタイムなバランス調整（LiveOps）を可能にするためです。"
+  },
+  {
+    title: "ハッカソン特有の「99人も人が集まらない」問題",
+    wall: "99人対戦ゲームを作っても、テスト時や本番の過疎帯に99人も人が集まらず、そもそも試合が始まらないという致命的なリスクがありました。",
+    solution: "InMemory接続を活用した「Botの自動補完」機能を実装し、足りない人数を自動でBotが埋めるフォールバックを用意しました。Botの強さも外部設定から変更可能です。",
+    reason: "人間が1人でも確実に試合を成立させ、かつ適度な歯ごたえ（Botの強さ制御）を提供してゲームとして成立させるためです。"
+  }
 ];
 
-const rules = [
-  "打鍵判定（TypingJudge）はクライアントの責務。サーバーに実装しない",
-  "protoを人間承認なしに変更して実装を進めない",
-  "internal/game/ から部品/スパインをimportしない（依存は部品/スパイン→gameの一方向）",
-  "調整値はコードに直書きせず、GameParameters経由で取得する",
-  "試合中の状態はDB/Redisに置かず、メモリ（Goの構造体）で持つ",
-  "PlayerListUpdatedを全員へ全員分フル配信しない（間引く）",
+const obsessions = [
+  {
+    title: "純粋関数コアとヘッドレスシミュレーション",
+    wall: "戦闘の権威である `internal/game` ロジックから「通信」と「時間」の概念を完全に排除しました。すべては外部から渡される `Tick(dt)` という入力だけで進むステートマシンになっています。",
+    solution: "実ネットワークを介さず「メモリ上だけで99体のBotを戦わせる」超高速の負荷テスト（InMemory Connection）の土台になりました。",
+    reason: "クライアント側の完成を待たずに、サーバー単体で「99人が実際に打ち合う負荷」の安全性を早期に証明するためです。"
+  },
+  {
+    title: "1試合 = 1Goroutineのロックフリー設計",
+    wall: "99人からの同時打鍵報告を、都度 Mutex（排他制御）でロックして状態更新すると、競合によるバグ（Race Condition）の温床になりがちです。",
+    solution: "1試合につき1つの Goroutine と Channel だけを用意し、すべてのネットワークイベント（報告）をそのChannelに流し込んで直列処理（Actorモデル風）にしました。",
+    reason: "競合状態を構造的に排除し、99人スケールでの安定性を極限まで高めるためです。ゲームのコアロジック内にロックは一切存在しません。"
+  },
+  {
+    title: "depguardによる「後輩からコアを守る」機械強制",
+    wall: "プロジェクトには後輩エンジニアも参加しており、彼らが自由にお題や作戦のコード（層3）を追加できるようにしつつ、心臓部の戦闘ロジック（層1）を絶対に壊されないようにする必要がありました。",
+    solution: "依存関係が常に「外から内」へ向かうようにインターフェース（DIP）を切り出し、層1への不要な import をCIツール（golangci-lint の depguard）で機械的に弾く設定にしました。",
+    reason: "口頭のルールではなく、CIによる機械的なブロックによって「安全な砂場」を提供し、チーム全体が安心して並行開発できるようにするためです。"
+  }
 ];
 
 export function BackendPage() {
@@ -291,8 +326,74 @@ export function BackendPage() {
 
       <hr className="hr" style={{ maxWidth: 960, margin: "0 auto" }} />
 
-      {/* ── 詳細1：設計の仕組み ── */}
+      {/* ── 詳細1：極限へのこだわり ── */}
       <section style={{ maxWidth: 960, margin: "0 auto", padding: "24px 24px" }}>
+        <Disclosure
+          title="実装の極限へのこだわり"
+          summary="純粋関数コア／ロックフリー設計／depguard機械強制"
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            <p style={sectionSubheading}>サーバーエンジニアとしての狂気</p>
+            {obsessions.map((obs, idx) => (
+              <div key={idx} style={{ paddingLeft: 16, borderLeft: "4px solid var(--color-accent-200)" }}>
+                <h4 style={{ margin: "0 0 8px", fontSize: 18, color: "var(--color-accent)" }}>{obs.title}</h4>
+                <p style={{ margin: "0 0 8px", fontSize: 14, lineHeight: 1.6 }}><strong>直面した課題:</strong> {obs.wall}</p>
+                <p style={{ margin: "0 0 8px", fontSize: 14, lineHeight: 1.6 }}><strong>解決策:</strong> {obs.solution}</p>
+                <p style={{ margin: "0", fontSize: 14, lineHeight: 1.6, color: "color-mix(in srgb, var(--color-text) 70%, transparent)" }}><strong>なぜやったか:</strong> {obs.reason}</p>
+              </div>
+            ))}
+          </div>
+        </Disclosure>
+      </section>
+
+      {/* ── 詳細2：実運用の壁 ── */}
+      <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 24px" }}>
+        <Disclosure
+          title="実運用の壁と戦闘ルールの刷新"
+          summary="DemoStageに向けた抜本改修／Enter攻撃の廃止／先読みと割り込み"
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            <p style={sectionSubheading}>ゲーム性と通信の課題への対応</p>
+            <p style={sectionBody}>
+              実際に動かして発覚したゲームテンポの悪さや、通信遅延による硬直に対処するため、DemoStage直前に大規模な「戦闘刷新」を行いました。
+            </p>
+            {combatReworks.map((rw, idx) => (
+              <div key={idx} style={{ paddingLeft: 16, borderLeft: "4px solid var(--color-accent-200)" }}>
+                <h4 style={{ margin: "0 0 8px", fontSize: 18, color: "var(--color-accent)" }}>{rw.title}</h4>
+                <p style={{ margin: "0 0 8px", fontSize: 14, lineHeight: 1.6 }}><strong>直面した壁:</strong> {rw.wall}</p>
+                <p style={{ margin: "0 0 8px", fontSize: 14, lineHeight: 1.6 }}><strong>解決策:</strong> {rw.solution}</p>
+                <p style={{ margin: "0", fontSize: 14, lineHeight: 1.6, color: "color-mix(in srgb, var(--color-text) 70%, transparent)" }}><strong>なぜやったか:</strong> {rw.reason}</p>
+              </div>
+            ))}
+          </div>
+        </Disclosure>
+      </section>
+
+      {/* ── 詳細3：インフラと運用体制 ── */}
+      <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 24px" }}>
+        <Disclosure
+          title="安定運用のためのインフラと設定管理"
+          summary="PostgresとAPI／Bot補完／ゴースト接続対策"
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            <p style={sectionSubheading}>サービスを止めずに調整する工夫</p>
+            <p style={sectionBody}>
+              99人対戦を止めずにゲームバランスを調整したり、ハッカソン特有の「人が集まらない」問題に対処するためのバックエンドの工夫です。
+            </p>
+            {infraOps.map((op, idx) => (
+              <div key={idx} style={{ paddingLeft: 16, borderLeft: "4px solid var(--color-accent-200)" }}>
+                <h4 style={{ margin: "0 0 8px", fontSize: 18, color: "var(--color-accent)" }}>{op.title}</h4>
+                <p style={{ margin: "0 0 8px", fontSize: 14, lineHeight: 1.6 }}><strong>直面した壁:</strong> {op.wall}</p>
+                <p style={{ margin: "0 0 8px", fontSize: 14, lineHeight: 1.6 }}><strong>解決策:</strong> {op.solution}</p>
+                <p style={{ margin: "0", fontSize: 14, lineHeight: 1.6, color: "color-mix(in srgb, var(--color-text) 70%, transparent)" }}><strong>なぜやったか:</strong> {op.reason}</p>
+              </div>
+            ))}
+          </div>
+        </Disclosure>
+      </section>
+
+      {/* ── 詳細4：設計の仕組み ── */}
+      <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 40px" }}>
         <Disclosure
           title="アーキテクチャの仕組みをもっと見る"
           summary="層アーキテクチャ／DIPと依存の方向／TargetingStrategy／Spine設計"
@@ -364,83 +465,6 @@ export function BackendPage() {
                 </thead>
                 <tbody>
                   {bandwidthRows.map((r) => (
-                    <tr key={r[0]}>
-                      <td>{r[0]}</td>
-                      <td>{r[1]}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div>
-            <p style={sectionSubheading}>やってはいけないことチェックリスト</p>
-            <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 8 }}>
-              {rules.map((t) => (
-                <li key={t.slice(0, 12)} style={{ fontSize: 14, lineHeight: 1.7, color: "color-mix(in srgb, var(--color-text) 78%, transparent)" }}>
-                  ❌ {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Disclosure>
-      </section>
-
-      {/* ── 詳細2：実運用の壁 ── */}
-      <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 24px" }}>
-        <Disclosure
-          title="実運用の壁と戦闘ルールの刷新"
-          summary="DemoStageに向けた抜本改修／Enter攻撃の廃止／先読みと割り込み"
-        >
-          <div>
-            <p style={sectionSubheading}>ゲーム性と通信の課題への対応</p>
-            <p style={sectionBody}>
-              実際に動かして発覚したゲームテンポの悪さや、通信遅延による硬直に対処するため、DemoStage直前に大規模な「戦闘刷新」を行いました。
-            </p>
-            <div style={tableScroll}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>歴史と改修内容</th>
-                    <th>詳細・背景</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {combatReworkRows.map((r) => (
-                    <tr key={r[0]}>
-                      <td>{r[0]}</td>
-                      <td>{r[1]}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </Disclosure>
-      </section>
-
-      {/* ── 詳細3：インフラと運用体制 ── */}
-      <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 40px" }}>
-        <Disclosure
-          title="安定運用のためのインフラと設定管理"
-          summary="PostgresとAPI／Bot補完／ゴースト接続対策"
-        >
-          <div>
-            <p style={sectionSubheading}>サービスを止めずに調整する工夫</p>
-            <p style={sectionBody}>
-              99人対戦を止めずにゲームバランスを調整したり、ハッカソン特有の「人が集まらない」問題に対処するためのバックエンドの工夫です。
-            </p>
-            <div style={tableScroll}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>インフラ・運用基盤</th>
-                    <th>詳細・背景</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {infraRows.map((r) => (
                     <tr key={r[0]}>
                       <td>{r[0]}</td>
                       <td>{r[1]}</td>
