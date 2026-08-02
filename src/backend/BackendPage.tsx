@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Nav } from "../layout/Nav";
 import { RemoteNav } from "../layout/RemoteNav";
 import { Disclosure } from "../layout/Disclosure";
@@ -200,9 +201,10 @@ export function BackendPage() {
           <i style={{ width: 10, height: 10, background: "var(--color-accent)", display: "inline-block", flexShrink: 0 }} />
           サーバーの処理フロー（Tick駆動）
         </span>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", rowGap: 16 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "center", rowGap: 16 }}>
           {coreLoop.map((step, i) => (
-            <div key={step.num} style={{ display: "flex", alignItems: "flex-start", gap: 4 }}>
+            <Fragment key={step.num}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 4 }}>
               <div
                 style={{
                   width: 168,
@@ -265,6 +267,8 @@ export function BackendPage() {
                 </svg>
               )}
             </div>
+            {step.num === "3" && <div style={{ flexBasis: "100%", width: 0 }} />}
+            </Fragment>
           ))}
         </div>
         <p style={{ margin: "24px 0 0", fontSize: 13, color: "color-mix(in srgb, var(--color-text) 55%, transparent)" }}>
